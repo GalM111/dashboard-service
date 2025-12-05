@@ -17,7 +17,7 @@ router.get('/news', newsController.fetchNews);
 router.get('/meme', memeController.fetchMeme);
 
 //Crtypto Route
-router.get('/crypto', cryptoController.fetchMeme);
+router.get('/crypto', cryptoController.fetchCryptoPrice);
 
 
 

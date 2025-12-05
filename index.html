@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>CryptoPanic WebSocket Test</title>
+</head>
+
+<body>
+    <h1>Crypto News (WebSocket)</h1>
+    <pre id="output"></pre>
+
+    <script>
+        // You can pass currencies/filter in the query string if you want:
+        // e.g. ws://localhost:3000?currencies=BTC,ETH&filter=important
+        const ws = new WebSocket('ws://localhost:3000');
+
+        const output = document.getElementById('output');
+
+        ws.onopen = () => {
+            output.textContent += 'Connected to WebSocket\n\n';
+        };
+
+        ws.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+
+            if (msg.type === 'news_update') {
+                output.textContent +=
+                    '--- Update ---\n' +
+                    JSON.stringify(msg.data, null, 2) +
+                    '\n\n';
+            } else if (msg.type === 'error') {
+                output.textContent += 'Error: ' + msg.message + '\n\n';
+            }
+        };
+
+        ws.onclose = () => {
+            output.textContent += 'WebSocket closed\n';
+        };
+
+        ws.onerror = (err) => {
+            output.textContent += 'WebSocket error\n';
+            console.error(err);
+        };
+    </script>
+</body>
+
+</html>

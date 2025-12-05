@@ -1,42 +1,40 @@
+// server.js
 require('dotenv').config();
-
 const express = require('express');
-const cors = require('cors');
+const http = require('http');
+const { Server } = require('socket.io');
 const userDataRoutes = require('./routes/userDataRoutes');
-
-
-// const { OpenRouter } = require('@openrouter/sdk');
-// const openRouter = new OpenRouter({
-//     apiKey: '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',
-//     // defaultHeaders: {
-//     //     'HTTP-Referer': '<YOUR_SITE_URL>', // Optional. Site URL for rankings on openrouter.ai.
-//     //     'X-Title': '<YOUR_SITE_NAME>', // Optional. Site title for rankings on openrouter.ai.
-//     // },
-// });
-
-
+const { registerPriceSocket } = require('./sockets/cryptoSocket');
 
 const app = express();
+const server = http.createServer(app);
 
-// Middleware
-app.use(express.json());
-app.use(cors());
-
-// Basic Hello World Route
-app.get('/', async (req, res) => {
-    res.status(200).json({
-        message: 'Hello World from dashboard Service!' + process.env.TEST + process.env.TEST_2,
-    });
+const io = new Server(server, {
+    cors: {
+        origin: '*', // change to your frontend URL in prod
+    },
 });
 
-// Health Check Route
-app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'Server is running' });
-});
-
-// UserData Routes
+// REST routes
 app.use('/api', userDataRoutes);
 
-// Start the server
-const PORT = process.env.PORT || 3002;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Simple health check
+app.get('/', (req, res) => {
+    res.send('Crypto price API & WebSocket server running');
+});
+
+// WebSocket setup
+registerPriceSocket(io);
+
+// Basic error handler (optional but recommended)
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(500).json({ error: 'Something went wrong' });
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+
+    console.log(process.env.PORT);
+    console.log(`Server listening on port ${PORT}`);
+});

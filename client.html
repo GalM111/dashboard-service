@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Crypto Live Prices</title>
+    <!-- socket.io client from CDN -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #0f172a;
+            color: #e5e7eb;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        #status {
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .status-connected {
+            color: #22c55e;
+        }
+
+        .status-disconnected {
+            color: #ef4444;
+        }
+
+        .card {
+            background: #020617;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .coin-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .price {
+            font-size: 1.2rem;
+        }
+
+        .change {
+            font-size: 0.9rem;
+            margin-top: 2px;
+        }
+
+        .change-pos {
+            color: #22c55e;
+        }
+
+        .change-neg {
+            color: #ef4444;
+        }
+
+        pre {
+            background: #020617;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Crypto Live Prices (socket.io)</h1>
+    <div id="status" class="status-disconnected">Connecting...</div>
+
+    <div id="cards"></div>
+
+    <h3>Raw data</h3>
+    <pre id="raw">Waiting for data...</pre>
+
+    <script>
+        // CHANGE THIS if your backend is on a different host/port
+        const SERVER_URL = "http://localhost:5002";
+
+        const statusEl = document.getElementById("status");
+        const rawEl = document.getElementById("raw");
+        const cardsEl = document.getElementById("cards");
+
+        const socket = io(SERVER_URL, {
+            transports: ["websocket", "polling"],
+        });
+
+        function setStatus(text, isConnected) {
+            statusEl.textContent = text;
+            statusEl.className = isConnected
+                ? "status-connected"
+                : "status-disconnected";
+        }
+
+        function renderPrices(data) {
+            // data looks like:
+            // {
+            //   bitcoin: { usd: 43000, usd_24h_change: 1.23 },
+            //   ethereum: { usd: 2200, usd_24h_change: -0.5 }
+            // }
+            cardsEl.innerHTML = "";
+
+            Object.entries(data).forEach(([id, info]) => {
+                const card = document.createElement("div");
+                card.className = "card";
+
+                const title = document.createElement("div");
+                title.className = "coin-title";
+                title.textContent = id.toUpperCase();
+
+                const price = document.createElement("div");
+                price.className = "price";
+                price.textContent = `$${info.usd?.toLocaleString() ?? "N/A"}`;
+
+                const change = document.createElement("div");
+                const changeVal = info.usd_24h_change;
+                let changeText = "24h: N/A";
+                let changeClass = "";
+
+                if (typeof changeVal === "number") {
+                    const fixed = changeVal.toFixed(2);
+                    changeText = `24h: ${fixed}%`;
+                    changeClass = changeVal >= 0 ? "change-pos" : "change-neg";
+                }
+
+                change.className = `change ${changeClass}`;
+                change.textContent = changeText;
+
+                card.appendChild(title);
+                card.appendChild(price);
+                card.appendChild(change);
+
+                cardsEl.appendChild(card);
+            });
+        }
+
+        // socket.io events
+        socket.on("connect", () => {
+            setStatus(`Connected (id: ${socket.id})`, true);
+        });
+
+        socket.on("disconnect", () => {
+            setStatus("Disconnected", false);
+        });
+
+        socket.on("connect_error", (err) => {
+            setStatus("Connection error: " + err.message, false);
+            console.error("connect_error", err);
+        });
+
+        socket.on("prices", (data) => {
+            rawEl.textContent = JSON.stringify(data, null, 2);
+            renderPrices(data);
+        });
+
+        socket.on("prices_error", (err) => {
+            console.error("prices_error", err);
+            rawEl.textContent =
+                "Error from server:\n" + JSON.stringify(err, null, 2);
+        });
+    </script>
+</body>
+
+</html>
