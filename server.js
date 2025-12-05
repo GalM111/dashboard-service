@@ -10,6 +10,10 @@ const { registerPriceSocket } = require('./sockets/cryptoSocket');
 const app = express();
 const server = http.createServer(app);
 
+// Parse JSON & form bodies before routes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const io = new Server(server, {
     cors: {
         origin: '*', // change to your frontend URL in prod

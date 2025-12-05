@@ -9,7 +9,7 @@ exports.fetchNews = async (req, res) => {
 
     try {
         const newsArr = await newsService.getCryptoPanicPosts();
-        console.log(newsArr);
+        // console.log(newsArr);
 
         res.status(200).json(newsArr);
     } catch (err) {

@@ -9,12 +9,14 @@ const cryptoController = require('../controllers/cryptoController');
 
 // AI Route 
 router.post('/ai', aiController.generateContent);
+router.post('/aiInsights', aiController.generateContent);
 
 //New Routes
 router.get('/news', newsController.fetchNews);
 
-//Meme Route
-router.get('/meme', memeController.fetchMeme);
+//Meme Routes
+router.post('/meme', memeController.fetchMeme);
+router.post('/memeAI', memeController.fetchAiMeme);
 
 //Crtypto Route
 router.get('/crypto', cryptoController.fetchCryptoPrice);

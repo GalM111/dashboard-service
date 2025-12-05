@@ -15,6 +15,23 @@ async function askAi(prompt) {
 
 }
 
+// function pasreUserDataToPrompt(userdata) {
+//     let parseedUserData = userdata.toObject();
+//     const { email, name, createdAt, ...rest } = parseedUserData;
+
+//     const resultStr = Object.entries(rest)
+//         .map(([key, value]) => {
+//             if (Array.isArray(value)) {
+//                 return `${key}: ${value.join(", ")}`;
+//             }
+//             return `${key}: ${value}`;
+//         })
+//         .join(", ");
+
+//     return resultStr;
+// }
+
+
 module.exports = {
     askAi,
 };  

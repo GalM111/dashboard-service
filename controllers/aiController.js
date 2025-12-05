@@ -5,8 +5,10 @@ const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 const aiService = require('../services/aiService');
 exports.generateContent = async (req, res) => {
     try {
+        console.log(req.body);
+
         const response = await aiService.askAi(req.body.prompt);
-        res.status(200).json({ message: 'Content generated successfully', data: response });
+        res.status(200).json(response);
     } catch (err) {
         res.status(500).json({ message: 'Error generating content', error: err.message });
     }
