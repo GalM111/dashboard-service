@@ -15,23 +15,17 @@ async function askAi(prompt) {
 
 }
 
-// function pasreUserDataToPrompt(userdata) {
-//     let parseedUserData = userdata.toObject();
-//     const { email, name, createdAt, ...rest } = parseedUserData;
+function parseUserDataPrompt(userData, news) {
 
-//     const resultStr = Object.entries(rest)
-//         .map(([key, value]) => {
-//             if (Array.isArray(value)) {
-//                 return `${key}: ${value.join(", ")}`;
-//             }
-//             return `${key}: ${value}`;
-//         })
-//         .join(", ");
+    if (userData != undefined) {
+        let prompt = `You are a crypto trading assistant. The user’s profile, including coins held, position sizes, risk tolerance, time horizon, trading style, and goals is: ${(JSON.stringify(userData)).replace(/[^a-zA-Z0-9 ]/g, " ")}. Today’s key market and news data is: ${(JSON.stringify(news)).replace(/[^a-zA-Z0-9 ]/g, " ")}. First, concisely explain today’s market context most relevant to this user. Then give coin-specific insights, opportunities, and risks, explicitly linking them to his profile. Finally, provide clear, practical tips for today’s trading and risk management. Respond in short, direct sentences.`;
+        return prompt
+    }
+    throw new Error("No User Data Provided");
 
-//     return resultStr;
-// }
+}
 
 
 module.exports = {
-    askAi,
+    askAi, parseUserDataPrompt,
 };  

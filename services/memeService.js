@@ -31,7 +31,7 @@ function getMemePrompt(userData, news) {
 
     if (userData != undefined) {
         let prompt = `based on ${(JSON.stringify(news)).replace(/[^a-zA-Z0-9 ]/g, " ")}, give me a name of gif  meme that is related to the new and to the user data: ${(JSON.stringify(userData)).replace(/[^a-zA-Z0-9 ]/g, " ")}, make it in one or two words only`;
-        prompt.replace(/[^a-zA-Z0-9 ]/g, " ");
+        // prompt.replace(/[^a-zA-Z0-9 ]/g, " ");
         // console.log(prompt);
         return prompt
     }

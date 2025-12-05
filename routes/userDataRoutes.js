@@ -9,7 +9,7 @@ const cryptoController = require('../controllers/cryptoController');
 
 // AI Route 
 router.post('/ai', aiController.generateContent);
-router.post('/aiInsights', aiController.generateContent);
+router.post('/aiInsights', aiController.generateInsights);
 
 //New Routes
 router.get('/news', newsController.fetchNews);
