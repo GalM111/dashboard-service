@@ -2,6 +2,7 @@
 require('dotenv').config();
 const express = require('express');
 const http = require('http');
+const cors = require('cors');
 const { Server } = require('socket.io');
 const userDataRoutes = require('./routes/userDataRoutes');
 const { registerPriceSocket } = require('./sockets/cryptoSocket');
@@ -14,6 +15,15 @@ const io = new Server(server, {
         origin: '*', // change to your frontend URL in prod
     },
 });
+
+// Allow Angular (or any origin) to hit REST endpoints
+app.use(
+    cors({
+        origin: process.env.CLIENT_ORIGIN || '*',
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    }),
+);
 
 // REST routes
 app.use('/api', userDataRoutes);
