@@ -2,14 +2,17 @@
 const { getCryptoPriceByIds } = require('../services/cryptoService');
 
 const INTERVAL_MS = 120_000;
-const DEFAULT_IDS = 'bitcoin,ethereum';
 
 function registerPriceSocket(io) {
     io.on('connection', (socket) => {
         console.log('Client connected:', socket.id);
-        let cryptoIds = DEFAULT_IDS;
+
+        let cryptoIds = null;
+        let intervalId = null;
 
         const sendPrices = async () => {
+            if (!cryptoIds) return; // nothing to send yet
+
             try {
                 const data = await getCryptoPriceByIds(cryptoIds);
                 socket.emit('prices', data);
@@ -19,12 +22,7 @@ function registerPriceSocket(io) {
             }
         };
 
-        // send once immediately
-        sendPrices();
-
-        // then every INTERVAL_MS
-        const intervalId = setInterval(sendPrices, INTERVAL_MS);
-
+        // 🔥 Only react to set_crypto_ids
         socket.on('set_crypto_ids', (ids) => {
             const normalizedIds = normalizeIds(ids);
             if (!normalizedIds) {
@@ -33,20 +31,27 @@ function registerPriceSocket(io) {
             }
 
             cryptoIds = normalizedIds;
+
+            // start interval the first time we get valid IDs
+            if (!intervalId) {
+                intervalId = setInterval(sendPrices, INTERVAL_MS);
+            }
+
+            // send once immediately
             sendPrices();
         });
 
         socket.on('disconnect', () => {
             console.log('Client disconnected:', socket.id);
-            clearInterval(intervalId); // prevent memory leaks
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
         });
     });
 }
 
 function normalizeIds(ids) {
-    if (!ids) {
-        return null;
-    }
+    if (!ids) return null;
 
     if (Array.isArray(ids)) {
         const cleaned = ids
