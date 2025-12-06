@@ -1,7 +1,7 @@
 // sockets/priceSocket.js
 const { getCryptoPriceByIds } = require('../services/cryptoService');
 
-const INTERVAL_MS = 10_000;
+const INTERVAL_MS = 120_000;
 const DEFAULT_IDS = 'bitcoin,ethereum';
 
 function registerPriceSocket(io) {
