@@ -13,7 +13,7 @@ exports.fetchMeme = async (req, res) => {
 exports.fetchAiMeme = async (req, res) => {
     try {
         const news = await newsService.getCryptoPanicPosts();
-        const prompt = memeService.getMemePrompt(req.body, news);
+        const prompt = await memeService.getMemePrompt(req.body, news);
         let aiPromptAnswer = await aiService.askAi(prompt);
         const response = await memeService.getMemeUrlByTitle(aiPromptAnswer || 'stocks');
         res.status(200).json(response);
