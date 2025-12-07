@@ -13,9 +13,6 @@ async function getCryptoPriceByIds(ids) {
             ids: normalizedIds,
             include_24hr_change: 'true',
         },
-        // headers: {
-        //     'x-cg-api-key': apiKey,
-        // },
     });
 
     return response.data;

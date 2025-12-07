@@ -6,7 +6,6 @@ const aiService = require('../services/aiService');
 const newsService = require('../services/newsService');
 exports.generateContent = async (req, res) => {
     try {
-        console.log(req.body);
         const response = await aiService.askAi(req.body.prompt);
         res.status(200).json(response);
     } catch (err) {
@@ -16,10 +15,8 @@ exports.generateContent = async (req, res) => {
 
 exports.generateInsights = async (req, res) => {
     try {
-        console.log(req.body);
         const news = await newsService.getCryptoPanicPosts();
         const parsedPrompt = aiService.parseUserDataPrompt(req.body, news);
-        console.log(parsedPrompt);
         const response = await aiService.askAi(parsedPrompt);
         res.status(200).json(response);
     } catch (err) {
