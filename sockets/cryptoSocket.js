@@ -1,4 +1,3 @@
-// sockets/priceSocket.js
 const { getCryptoPriceByIds } = require('../services/cryptoService');
 
 const INTERVAL_MS = 120_000;
@@ -11,7 +10,7 @@ function registerPriceSocket(io) {
         let intervalId = null;
 
         const sendPrices = async () => {
-            if (!cryptoIds) return; // nothing to send yet
+            if (!cryptoIds) return;
 
             try {
                 const data = await getCryptoPriceByIds(cryptoIds);
@@ -22,7 +21,6 @@ function registerPriceSocket(io) {
             }
         };
 
-        // 🔥 Only react to set_crypto_ids
         socket.on('set_crypto_ids', (ids) => {
             const normalizedIds = normalizeIds(ids);
             if (!normalizedIds) {
@@ -37,7 +35,6 @@ function registerPriceSocket(io) {
                 intervalId = setInterval(sendPrices, INTERVAL_MS);
             }
 
-            // send once immediately
             sendPrices();
         });
 
